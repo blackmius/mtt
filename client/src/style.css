@@ -1,0 +1,86 @@
+@import url('https://fonts.googleapis.com/css?family=PT+Sans&display=swap');
+
+* { box-sizing: border-box; }
+html { font: 400 10px/15px 'PT Sans', sans-serif }
+body { margin: 0; }
+
+.l1, .l2, .l3, .l4, .l5 { position: relative; }
+
+.l1 { font-size: 14px; line-height: 15px; top: 2px; }
+.l2 { font-size: 20px; line-height: 30px; top: 7px; }
+.l3 { font-size: 28px; line-height: 30px; top: 4px; }
+.l4 { font-size: 36px; line-height: 45px; top: 8px; }
+.l5 { font-size: 44px; line-height: 45px; top: 4px; }
+
+.b { font-weight: bold; }
+
+.c0 { color: transparent; }
+.c1 { color: #232323; }
+.c2 { color: #737373; }
+
+.bg1 { background: #f7f7f5; }
+
+.sp1 { margin-top: 15px; }
+.sp2 { margin-top: 30px; }
+.sp3 { margin-top: 45px; }
+
+.tc { text-align: center; }
+.tr { text-align: right; }
+
+.uc { text-transform: uppercase; }
+.cc { text-transform: capitalize; }
+
+.text { white-space: pre; }
+
+.cp { cursor: pointer; }
+
+a { text-decoration: none; color: inherit; outline: none }
+.h { margin-top: -1px; border-bottom: 1px solid #8ddbff; transition: background .3s; }
+.h:hover { background: #8ddbff; }
+
+input { background: transparent; color: transparent; caret-color: #232323; border: 0; outline: none; margin: 0; padding: 0; font-family: inherit; left: 0px;  }
+.h1 { margin-top: -1px; border-bottom: 1px solid #ddd; }
+.fw { width: 100%; }
+
+.ib { display: inline-block; }
+
+.pr { position: relative; }
+.pa { position: absolute; }
+
+.g { display: flex; flex-wrap: wrap; }
+.nw { flex-wrap: nowrap; }
+.jc { justify-content: center; }
+.s1 { flex: 1; }
+
+.g { margin-left: -1.5em; }
+.g > * { margin-left: 1.5em; }
+.g > .g { margin-left: 0; }
+
+.g.gp1 { margin-left: -6em; }
+.g.gp1 > * { margin-left: 6em; }
+
+.ml0 { margin-left: 0em; }
+
+.sz1 { width: 4em}
+.sz2 { width: 8em; }
+.sz3 { width: 12em; }
+.sz9 { width: 36em; }
+
+.ys { overflow-y: auto; }
+.ov { position: absolute; top: 0; bottom: 0; left: 0; right: 0; }
+.main { padding: 60px 45px; }
+
+@media only screen and (max-width: 450px) {
+    .main { padding: 45px 30px; }
+
+    .l1 { font-size: 9px; line-height: 15px; top: 3px; }
+    .l2 { font-size: 14px; line-height: 15px; top: 2px; }
+    .l3 { font-size: 20px; line-height: 30px; top: 7px; }
+    .l4 { font-size: 26px; line-height: 30px; top: 5px; }
+    .l5 { font-size: 32px; line-height: 45px; top: 10px; }
+
+    /*.sp1 { margin-top: 0px; }*/
+    .sp2 { margin-top: 15px; }
+    .sp3 { margin-top: 30px; }
+
+}
