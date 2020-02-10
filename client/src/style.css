@@ -61,7 +61,8 @@ input { background: transparent; color: transparent; caret-color: #232323; borde
 
 .ml0 { margin-left: 0em; }
 
-.sz1 { width: 4em}
+.sz1 { width: 4em; }
+.sz05{ width: 5em; }
 .sz2 { width: 8em; }
 .sz3 { width: 12em; }
 .sz9 { width: 36em; }
@@ -82,5 +83,11 @@ input { background: transparent; color: transparent; caret-color: #232323; borde
     /*.sp1 { margin-top: 0px; }*/
     .sp2 { margin-top: 15px; }
     .sp3 { margin-top: 30px; }
+
+    .sz1 { width: 2em; }
+    .sz05{ width: 3em; }
+    .sz2 { width: 4em; }
+    .sz3 { width: 6em; }
+    .sz9 { width: 24em; }
 
 }

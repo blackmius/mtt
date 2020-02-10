@@ -12,7 +12,7 @@ const Back = z._a.l2({ href: '#' }, 'На главную');
 const Group = _=> {
     const id = Number(page.args.id);
     const start = moment().startOf('isoWeek');
-    const week = start.week() - moment(new Date(start.year(), 8)).week();
+    const week = Math.abs(start.week() - moment(new Date(start.year(), 8)).week());
     const pairs = data.pairGroup.filter(
         ({pair, group}) => group === id && (data.weeks[data.pairs[pair].week] === 'Всегда' || data.weeks[data.pairs[pair].week] ===  ['Верхняя', 'Нижняя'][week % 2])
     ).map(({pair}) => pair);
@@ -20,7 +20,7 @@ const Group = _=> {
         Back, z.sp1,
         z.l4.b(data.groups[id]),
         z.g.gp1([0,1,2,3,4].map(d => {
-            const ppairs = pairs.filter(p => data.pairs[p].day === d);
+            const ppairs = pairs.filter(p => data.pairs[p].day === d).sort((a, b) => data.pairs[a].time - data.pairs[b].time);;
             const day = start.format('dddd, D MMMM');
             start.add(1, 'day');
             return ppairs.length
@@ -28,7 +28,7 @@ const Group = _=> {
                     z.l2.c2.cc(day),
                     ppairs.map(p => z._a.g.nw.sp2(
                         { href: page.link('pair', { id: p }) },
-                        Titled('Время', z.l2(data.timestart[data.pairs[p].time])),
+                        z.sz05(Titled('Время', z.l2(data.timestart[data.pairs[p].time]))),
                         z.v(
                             Titled(data.types[data.pairs[p].type], z.l2.b(data.subjects[data.pairs[p].subject])),
                             z.g(
@@ -70,7 +70,7 @@ const Pair = _ => {
 const Teacher = _ => {
     const id = Number(page.args.id);
     const start = moment().startOf('isoWeek');
-    const week = start.week() - moment(new Date(start.year(), 8)).week();
+    const week = Math.abs(start.week() - moment(new Date(start.year(), 8)).week());
     const pairs = Object.entries(data.pairs).filter(
         ([pair, {lector}]) => lector === id && (data.weeks[data.pairs[Number(pair)].week] === 'Всегда' || data.weeks[data.pairs[Number(pair)].week] ===  ['Верхняя', 'Нижняя'][week % 2])
     ).map(([pair]) => Number(pair));
@@ -78,7 +78,7 @@ const Teacher = _ => {
         Back, z.sp1,
         z.l4.b(data.lectors[id]),
         z.g.gp1([0,1,2,3,4].map(d => {
-            const ppairs = pairs.filter((pair) => data.pairs[pair].day === d);
+            const ppairs = pairs.filter((pair) => data.pairs[pair].day === d).sort((a, b) => data.pairs[a].time - data.pairs[b].time);
             const day = start.format('dddd, D MMMM');
             start.add(1, 'day');
             return ppairs.length
@@ -88,7 +88,7 @@ const Teacher = _ => {
                         const groups = Object.values(data.pairGroup).filter(p => p.pair === pair);
                         return z._a.g.nw.sp2(
                             { href: page.link('pair', { id: pair }) },
-                            Titled('Время', z.l2(data.timestart[data.pairs[pair].time])),
+                            z.sz05(Titled('Время', z.l2(data.timestart[data.pairs[pair].time]))),
                             z.v(
                                 Titled(data.types[data.pairs[pair].type], z.l2.b(data.subjects[data.pairs[pair].subject])),
                                 z.g(                            
@@ -106,7 +106,7 @@ const Teacher = _ => {
 const Auditory = _ => {
     const id = Number(page.args.id);
     const start = moment().startOf('isoWeek');
-    const week = start.week() - moment(new Date(start.year(), 8)).week();
+    const week = Math.abs(start.week() - moment(new Date(start.year(), 8)).week());
     const pairs = Object.entries(data.pairs).filter(
         ([pair, {auditory}]) => auditory === id && (data.weeks[data.pairs[Number(pair)].week] === 'Всегда' || data.weeks[data.pairs[Number(pair)].week] ===  ['Верхняя', 'Нижняя'][week % 2])
     ).map(([pair]) => Number(pair));
@@ -114,7 +114,7 @@ const Auditory = _ => {
         Back, z.sp1,
         z.l4.b('Аудитория ' + data.auditories[id]),
         z.g.gp1([0,1,2,3,4].map(d => {
-            const ppairs = pairs.filter((pair) => data.pairs[pair].day === d);
+            const ppairs = pairs.filter((pair) => data.pairs[pair].day === d).sort((a, b) => data.pairs[a].time - data.pairs[b].time);;
             const day = start.format('dddd, D MMMM');
             start.add(1, 'day');
             return ppairs.length
@@ -124,7 +124,7 @@ const Auditory = _ => {
                         const groups = Object.values(data.pairGroup).filter(p => p.pair === pair);
                         return z._a.g.nw.sp2(
                             { href: page.link('pair', { id: pair }) },
-                            Titled('Время', z.l2(data.timestart[data.pairs[pair].time])),
+                            z.sz05(Titled('Время', z.l2(data.timestart[data.pairs[pair].time]))),
                             z.v(
                                 Titled(data.types[data.pairs[pair].type], z.l2.b(data.subjects[data.pairs[pair].subject])),
                                 z.g(                            
