@@ -69,6 +69,7 @@ def parsePair(day, time, x, group, week, string):
     for p in pairs:
         if p['day'] == day and p['time'] == time and p['x'] == x and p['week'] == weeks[week]:
             pairGroup.append({'pair': p['id'], 'group': groups[group]})
+            p['type'] = types['Лекция']
             return
     res['x'] = x
     res['id'] = len(pairs)
@@ -78,11 +79,11 @@ def parsePair(day, time, x, group, week, string):
     res['week'] = weeks[week]
     subject = subjectParser.find(string)
     if subject: res['subject'] = subjects[subject.fact.name]
-    #else: print(string)
+    else: print(string)
     lector = lectorParser.find(string)
     if lector: res['lector'] = lectors[lector.fact.name.last + (' ' + lector.fact.name.first if lector.fact.name.first else '') + (' ' + lector.fact.name.middle if lector.fact.name.middle else '')]
     auditory = auditoryParser.find(string)
-    if auditory: res['auditory'] = auditories[(auditory.fact.type or '') + str(auditory.fact.number)]
+    if auditory: res['auditory'] = auditories[(auditory.fact.type or '') + str(auditory.fact.number) + (auditory.fact.art or '')]
     type_ = typeParser.find(string)
     res['type'] = types[type_.fact.name if type_ else 'Практическое занятие']
     pairs.append(res)

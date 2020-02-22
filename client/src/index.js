@@ -11,7 +11,7 @@ const Back = z._a.l2({ href: '#' }, 'На главную');
 
 const Group = _=> {
     const id = Number(page.args.id);
-    const start = moment().startOf('isoWeek');
+    const start = moment().add(2, 'day').startOf('isoWeek');
     const week = Math.abs(start.week() - moment(new Date(start.year(), 8)).week());
     const pairs = data.pairGroup.filter(
         ({pair, group}) => group === id && (data.weeks[data.pairs[pair].week] === 'Всегда' || data.weeks[data.pairs[pair].week] ===  ['Верхняя', 'Нижняя'][week % 2])
@@ -69,7 +69,7 @@ const Pair = _ => {
 
 const Teacher = _ => {
     const id = Number(page.args.id);
-    const start = moment().startOf('isoWeek');
+    const start = moment().add(2, 'day').startOf('isoWeek');
     const week = Math.abs(start.week() - moment(new Date(start.year(), 8)).week());
     const pairs = Object.entries(data.pairs).filter(
         ([pair, {lector}]) => lector === id && (data.weeks[data.pairs[Number(pair)].week] === 'Всегда' || data.weeks[data.pairs[Number(pair)].week] ===  ['Верхняя', 'Нижняя'][week % 2])
@@ -105,7 +105,7 @@ const Teacher = _ => {
 
 const Auditory = _ => {
     const id = Number(page.args.id);
-    const start = moment().startOf('isoWeek');
+    const start = moment().add(2, 'day').startOf('isoWeek');
     const week = Math.abs(start.week() - moment(new Date(start.year(), 8)).week());
     const pairs = Object.entries(data.pairs).filter(
         ([pair, {auditory}]) => auditory === id && (data.weeks[data.pairs[Number(pair)].week] === 'Всегда' || data.weeks[data.pairs[Number(pair)].week] ===  ['Верхняя', 'Нижняя'][week % 2])
@@ -142,7 +142,7 @@ const Auditory = _ => {
 let v = '';
 
 const LastSearch = _ => {
-    const last = JSON.parse(localStorage.timetableLastResult || '[]');
+    const last = JSON.parse(localStorage.timetableLastResult || '[]').filter(([cat, id]) => cat in data && id in data[cat]);
     return last.length
         ? Titled('Предыдущие результаты поиска',
             last.map(([cat, id]) => z.v(z._a.l2({ href: page.link({
@@ -155,7 +155,7 @@ const LastSearch = _ => {
 
 function addSearchHistory(cat, id, name) {
     const inst = [cat, id];
-    const history = JSON.parse(localStorage.timetableLastResult || '[]');
+    const history = JSON.parse(localStorage.timetableLastResult || '[]').filter(([cat, id]) => cat in data && id in data[cat]);
     v = '';
     if (history.some(([ccat, iid]) => ccat === cat & iid === id)) return;
     localStorage.timetableLastResult = JSON.stringify([inst].concat(history.slice(0, 4)));

@@ -8,7 +8,15 @@ DASH = eq('-')
 
 Auditory = fact(
     'Auditory',
-    ['type', 'number']
+    ['type', 'number', 'art']
+)
+
+ART = rule(
+    dictionary({
+        'а', 'б'
+    })
+).interpretation(
+    Auditory.art
 )
 
 TYPE = rule(
@@ -33,7 +41,8 @@ AUDITORY = rule(
     DOT.optional(),
     TYPE.optional(),
     DASH.optional(),
-    NUMBER
+    NUMBER,
+    ART.optional()
 ).interpretation(
     Auditory
 )
