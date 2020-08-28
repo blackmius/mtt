@@ -257,7 +257,10 @@ export let page = {
         var result = [route];
         Object.entries(args).forEach(([k, v]) => {
             if (v !== undefined)
-              result.push(encodeURIComponent(k) + '=' + encodeURIComponent(v));
+              if (v === '')
+                result.push(encodeURIComponent(k))
+              else
+                result.push(encodeURIComponent(k) + '=' + encodeURIComponent(v));
         });
         return '#' + result.join(';');
     },

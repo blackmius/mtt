@@ -19,6 +19,7 @@
     "rollup-plugin-postcss": "^2.0.3"
   },
   "dependencies": {
-    "eslint4b-prebuilt": "^6.7.1"
+    "eslint4b-prebuilt": "^6.7.1",
+    "rollup-plugin-json": "^4.0.0"
   }
 }

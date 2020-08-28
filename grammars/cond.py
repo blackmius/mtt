@@ -26,6 +26,8 @@ NUMBER = rule(
         RANGE
     ),
     COMMA.optional()
+).interpretation(
+    Cond.weeks
 )
 
 COND = rule(
@@ -34,4 +36,6 @@ COND = rule(
     eq('нед'),
     DOT.optional(),
     eq(')').optional()
+).interpretation(
+    Cond
 )

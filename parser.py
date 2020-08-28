@@ -21,6 +21,7 @@ subjectParser = Parser(grammars.SUBJECT)
 lectorParser = Parser(grammars.LECTOR)
 auditoryParser = Parser(grammars.AUDITORY)
 typeParser = Parser(grammars.TYPE)
+condParser = Parser(grammars.COND)
 
 pairs = []
 
@@ -65,6 +66,8 @@ lectors = SurnameSet()
 auditories = IncrementedSet()
 
 def parsePair(day, time, x, group, week, string):
+    if not string.strip():
+        return
     res = {}
     for p in pairs:
         if p['day'] == day and p['time'] == time and p['x'] == x and p['week'] == weeks[week]:
@@ -81,11 +84,14 @@ def parsePair(day, time, x, group, week, string):
     if subject: res['subject'] = subjects[subject.fact.name]
     else: print(string)
     lector = lectorParser.find(string)
-    if lector: res['lector'] = lectors[lector.fact.name.last + (' ' + lector.fact.name.first if lector.fact.name.first else '') + (' ' + lector.fact.name.middle if lector.fact.name.middle else '')]
-    auditory = auditoryParser.find(string)
-    if auditory: res['auditory'] = auditories[(auditory.fact.type or '') + str(auditory.fact.number) + (auditory.fact.art or '')]
+    if lector and lector.fact.name.last:
+        res['lector'] = lectors[lector.fact.name.last + (' ' + lector.fact.name.first if lector.fact.name.first else '') + (' ' + lector.fact.name.middle if lector.fact.name.middle else '')]
+    auditory = auditoryParser.find(re.sub(r'\(.*\)', '', string))
+    if auditory:
+        res['auditory'] = auditories[(auditory.fact.type or '') + str(auditory.fact.number) + (auditory.fact.art or '')]
     type_ = typeParser.find(string)
     res['type'] = types[type_.fact.name if type_ else 'Практическое занятие']
+    #cond = condParser.find(string)
     pairs.append(res)
 
 infcol =  ['дни', 'часы', 'группы']
@@ -110,36 +116,51 @@ def parseTable(path):
         startRow += 1
         columns = sh.row(startRow)
 
+    print(path)
+
     for x, cell in enumerate(columns):
         name = cell.value
         if name.lower() in skip:
             continue
 
+        print(name)
+
         for day in range(5):
             for time in range(5):
                 lines = []
                 t = 0
-                xx = x
+                
+                splited = False
+                cell = sh.cell(startRow + 1 + day*20 + time*4+1, x)
+                border = wb.xf_list[cell.xf_index].border
+                if border.bottom_line_style:
+                    splited = True
+                    
+                x1 = x    
                 for (c0, c1) in merged_cells[startRow + 1 + day*20 + time*4]:
                     if c0 <= x < c1:
-                        xx = c0
+                        x1 = c0
                         break
+                x2 = x
+                for (c0, c1) in merged_cells[startRow + 1 + day*20 + time*4 + 2]:
+                    if c0 <= x < c1:
+                        x2 = c0
+                        break
+                    
                 for line in range(4):
-                    lineCell = sh.cell(startRow + 1 + day*20 + time*4 + line, xx)
-                    val = lineCell.value.strip()
+                    _x = x1
+                    if line > 1:
+                        _x = x2
+                    cell = sh.cell(startRow + 1 + day*20 + time*4 + line, _x)
+                    val = cell.value.strip()
                     lines.append(val)
-                    if val != '': t += 1 << (3-line)
-                xx = path+str(xx)
-                if t == 0b1100: parsePair(day, time, xx, name, EVEN, lines[0] + ' ' + lines[1])
-                elif t == 0b0011: parsePair(day, time, xx, name, ODD, lines[2] + ' ' + lines[3])
-                elif t == 0: continue
+
+                if len(lines) == 0: continue
+                elif splited:
+                    parsePair(day, time, x1, name, EVEN, lines[0] + ' ' + lines[1])
+                    parsePair(day, time, x2, name, ODD, lines[2] + ' ' + lines[3])
                 else:
-                    # БАБКИ, СУКА, БАБКИ
-                    if len(list(subjectParser.findall(' '.join(lines)))) > 1:
-                        parsePair(day, time, xx, name, EVEN, lines[0] + ' ' + lines[1])
-                        parsePair(day, time, xx, name, ODD, lines[2] + ' ' + lines[3])
-                    else:
-                        parsePair(day, time, xx, name, ALLWAYS, ' '.join(lines))
+                    parsePair(day, time, x1, name, ALLWAYS, ' '.join(lines))
 for tb in os.listdir('sheets'):
     parseTable('sheets/'+tb)
 
@@ -149,16 +170,19 @@ for pair in pairs:
     del pair['id']
     del pair['x']
 
-print({
-    'pairGroup': pairGroup,
-    'pairs': __pairs,
-    'groups': groups.reverseLookup(),
-    'weeks': weeks.reverseLookup(),
-    'types': types.reverseLookup(),
-    'subjects': subjects.reverseLookup(),
-    'lectors': lectors.reverseLookup(),
-    'auditories': auditories.reverseLookup(),
-    'days': { 0: 'Понедельник', 1: 'Вторник', 2: 'Среда', 3: 'Четверг', 4: 'Пятница' },
-    'timestart': { 0: '9:30', 1: '11:15', 2: '13:00', 3: '15:15', 4: '16:55' },
-    'timeend': { 0: '11:05', 1: '12:50', 2: '14:35', 3: '16:45', 4: '18:25' }
-})
+import json
+
+with open('client/src/data.json', 'w') as f:
+    f.write(json.dumps({
+        'pairGroup': pairGroup,
+        'pairs': __pairs,
+        'groups': groups.reverseLookup(),
+        'weeks': weeks.reverseLookup(),
+        'types': types.reverseLookup(),
+        'subjects': subjects.reverseLookup(),
+        'lectors': lectors.reverseLookup(),
+        'auditories': auditories.reverseLookup(),
+        'days': { 0: 'Понедельник', 1: 'Вторник', 2: 'Среда', 3: 'Четверг', 4: 'Пятница' },
+        'timestart': { 0: '9:30', 1: '11:20', 2: '13:10', 3: '15:25', 4: '17:15' },
+        'timeend': { 0: '11:05', 1: '12:55', 2: '14:45', 3: '17:00', 4: '18:50' }
+    }))
