@@ -5,17 +5,25 @@ import xlrd
 import re
 import os
 
+import traceback
+
 from yargy import Parser
 import grammars
 
 if not os.path.exists('sheets'):
     os.mkdir('sheets')
 
-def download():
     page = urllib.request.urlopen('http://www.mtuci.ru/time-table/')
     soup = BeautifulSoup(page, 'html.parser')
     for link in soup.find_all('a', text=re.compile('^Расписание занятий')):
-        urllib.request.urlretrieve('http://www.mtuci.ru/time-table/' + link['href'], 'sheets/' + link.text + '.xls')
+        filename, headers = urllib.request.urlretrieve('http://www.mtuci.ru/time-table/' + link['href'])
+        realname = headers['Content-Disposition'].split('filename=')[1]
+        os.rename(filename, f'sheets/{realname}')
+        if realname.endswith('xlsx'):
+            os.system(f'libreoffice --convert-to xls sheets/{realname} --outdir ./sheets')
+            os.remove(f'sheets/{realname}')
+        print(f'Загружено {link.text}')
+            
 
 subjectParser = Parser(grammars.SUBJECT)
 lectorParser = Parser(grammars.LECTOR)
@@ -102,67 +110,83 @@ EVEN = 'Верхняя'
 ODD = 'Нижняя'
 
 def parseTable(path):
+    print('\n', path, '\n')
     wb = xlrd.open_workbook(path, formatting_info=True)
-    sh = wb.sheet_by_index(0)
+    sheet = 0
+    for sh in wb.sheets():
+        sheet += 1
+        
+        try:
+            merged_cells = defaultdict(list)
+            for (r0, r1, c0, c1) in sh.merged_cells:
+                if r1 - r0 != 1: continue
+                merged_cells[r0].append((c0, c1))
 
-    merged_cells = defaultdict(list)
-    for (r0, r1, c0, c1) in sh.merged_cells:
-        if r1 - r0 != 1: continue
-        merged_cells[r0].append((c0, c1))
-
-    startRow = 0
-    columns = sh.row(startRow)
-    while columns[0].value.lower() not in infcol:
-        startRow += 1
-        columns = sh.row(startRow)
-
-    print(path)
-
-    for x, cell in enumerate(columns):
-        name = cell.value
-        if name.lower() in skip:
-            continue
-
-        print(name)
-
-        for day in range(5):
-            for time in range(5):
-                lines = []
-                t = 0
+            startRow = 0
+            columns = sh.row(startRow)
+            while columns[0].value.lower() not in infcol:
+                startRow += 1
+                columns = sh.row(startRow)
                 
-                splited = False
-                cell = sh.cell(startRow + 1 + day*20 + time*4+1, x)
-                border = wb.xf_list[cell.xf_index].border
-                if border.bottom_line_style:
-                    splited = True
-                    
-                x1 = x    
-                for (c0, c1) in merged_cells[startRow + 1 + day*20 + time*4]:
-                    if c0 <= x < c1:
-                        x1 = c0
-                        break
-                x2 = x
-                for (c0, c1) in merged_cells[startRow + 1 + day*20 + time*4 + 2]:
-                    if c0 <= x < c1:
-                        x2 = c0
-                        break
-                    
-                for line in range(4):
-                    _x = x1
-                    if line > 1:
-                        _x = x2
-                    cell = sh.cell(startRow + 1 + day*20 + time*4 + line, _x)
-                    val = cell.value.strip()
-                    lines.append(val)
+            skip_ = 0
 
-                if len(lines) == 0: continue
-                elif splited:
-                    parsePair(day, time, x1, name, EVEN, lines[0] + ' ' + lines[1])
-                    parsePair(day, time, x2, name, ODD, lines[2] + ' ' + lines[3])
-                else:
-                    parsePair(day, time, x1, name, ALLWAYS, ' '.join(lines))
+            for x, cell in enumerate(columns):
+                name = cell.value
+                if name.lower() in skip:
+                    skip_ += 1
+                    continue
+                    
+                prefix = f'{path}{sheet}{skip_}'
+
+                print(name)
+                
+                try:
+                    for day in range(5):
+                        for time in range(5):
+                            lines = []
+                            t = 0
+                            
+                            splited = False
+                            cell = sh.cell(startRow + 1 + day*20 + time*4+1, x)
+                            border = wb.xf_list[cell.xf_index].border
+                            if border.bottom_line_style:
+                                splited = True
+                                
+                            x1 = x    
+                            for (c0, c1) in merged_cells[startRow + 1 + day*20 + time*4]:
+                                if c0 <= x < c1:
+                                    x1 = c0
+                                    break
+                            x2 = x
+                            for (c0, c1) in merged_cells[startRow + 1 + day*20 + time*4 + 2]:
+                                if c0 <= x < c1:
+                                    x2 = c0
+                                    break
+                                
+                            for line in range(4):
+                                _x = x1
+                                if line > 1:
+                                    _x = x2
+                                cell = sh.cell(startRow + 1 + day*20 + time*4 + line, _x)
+                                val = str(cell.value).strip()
+                                lines.append(val)
+
+                            if len(lines) == 0: continue
+                            elif splited:
+                                parsePair(day, time, f'{prefix}{x1}', name, EVEN, lines[0] + ' ' + lines[1])
+                                parsePair(day, time, f'{prefix}{x2}', name, ODD, lines[2] + ' ' + lines[3])
+                            else:
+                                parsePair(day, time, f'{prefix}{x1}', name, ALLWAYS, ' '.join(lines))
+                except Exception as e:
+                    traceback.print_exc()
+        except Exception as e:
+            pass
+                    
 for tb in os.listdir('sheets'):
-    parseTable('sheets/'+tb)
+    try:
+        parseTable('sheets/'+tb)
+    except Exception as e:
+        traceback.print_exc()
 
 __pairs = {}
 for pair in pairs:

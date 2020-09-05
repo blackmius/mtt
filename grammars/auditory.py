@@ -24,7 +24,9 @@ TYPE = rule(
         'улк',
         'л',
         'а',
-        'вц'
+        'вц',
+        'авиамоторная',
+        'спортзал'
     }),
 ).interpretation(
     Auditory.type
