@@ -14,6 +14,8 @@ const ChangeWeek = week => z.l2.sp1('Cейчас ',
     }, ['Верхняя', 'Нижняя'][week % 2]),
     ' неделя');
 
+const days = [0,1,2,3,4,5];
+
 const Group = _=> {
     const id = Number(page.args.id);
     const start = moment().add(2, 'day').startOf('isoWeek').add((page.args.n === '' ? 7 : 0), 'day');
@@ -25,7 +27,7 @@ const Group = _=> {
         Back, z.sp1,
         z.l4.b(data.groups[id]),
         ChangeWeek(week),
-        z.g.gp1([0,1,2,3,4].map(d => {
+        z.g.gp1(days.map(d => {
             const ppairs = pairs.filter(p => data.pairs[p].day === d).sort((a, b) => data.pairs[a].time - data.pairs[b].time);
             const day = start.format('dddd, D MMMM');
             start.add(1, 'day');
@@ -84,7 +86,7 @@ const Teacher = _ => {
         Back, z.sp1,
         z.l4.b(data.lectors[id]),
         ChangeWeek(week),
-        z.g.gp1([0,1,2,3,4].map(d => {
+        z.g.gp1(days.map(d => {
             const ppairs = pairs.filter((pair) => data.pairs[pair].day === d).sort((a, b) => data.pairs[a].time - data.pairs[b].time);
             const day = start.format('dddd, D MMMM');
             start.add(1, 'day');
@@ -121,7 +123,7 @@ const Auditory = _ => {
         Back, z.sp1,
         z.l4.b('Аудитория ' + data.auditories[id]),
         ChangeWeek(week),
-        z.g.gp1([0,1,2,3,4].map(d => {
+        z.g.gp1(days.map(d => {
             const ppairs = pairs.filter((pair) => data.pairs[pair].day === d).sort((a, b) => data.pairs[a].time - data.pairs[b].time);;
             const day = start.format('dddd, D MMMM');
             start.add(1, 'day');

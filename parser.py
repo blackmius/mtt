@@ -13,16 +13,26 @@ import grammars
 if not os.path.exists('sheets'):
     os.mkdir('sheets')
 
+if len(os.listdir('sheets')) == 0:
+    
+    opener = urllib.request.build_opener()
+    opener.addheaders = [('User-agent', 'Mozilla/5.0'), ('Referer', 'http://mtuci.ru/time-table/')]
+    urllib.request.install_opener(opener)
+
     page = urllib.request.urlopen('http://www.mtuci.ru/time-table/')
     soup = BeautifulSoup(page, 'html.parser')
-    for link in soup.find_all('a', text=re.compile('^Расписание занятий')):
-        filename, headers = urllib.request.urlretrieve('http://www.mtuci.ru/time-table/' + link['href'])
-        realname = headers['Content-Disposition'].split('filename=')[1]
-        os.rename(filename, f'sheets/{realname}')
-        if realname.endswith('xlsx'):
-            os.system(f'libreoffice --convert-to xls sheets/{realname} --outdir ./sheets')
-            os.remove(f'sheets/{realname}')
-        print(f'Загружено {link.text}')
+    for link in soup.find_all('a', text=re.compile('^Факультет')):
+        try:
+            url = 'http://www.mtuci.ru/time-table/' + urllib.parse.quote(link['href'])
+            filename, headers = urllib.request.urlretrieve(url)
+            realname = os.path.basename(link['href'])
+            os.rename(filename, f'sheets/{realname}')
+            if realname.endswith('xlsx'):
+                os.system(f'libreoffice --convert-to xls "sheets/{realname}" --outdir ./sheets')
+                os.remove(f'sheets/{realname}')
+            print(f'Загружено {link.text}')
+        except Exception as e:
+            traceback.print_exc()
             
 
 subjectParser = Parser(grammars.SUBJECT)
@@ -141,7 +151,7 @@ def parseTable(path):
                 print(name)
                 
                 try:
-                    for day in range(5):
+                    for day in range(6):
                         for time in range(5):
                             lines = []
                             t = 0
@@ -177,6 +187,8 @@ def parseTable(path):
                                 parsePair(day, time, f'{prefix}{x2}', name, ODD, lines[2] + ' ' + lines[3])
                             else:
                                 parsePair(day, time, f'{prefix}{x1}', name, ALLWAYS, ' '.join(lines))
+                except IndexError:
+                    pass
                 except Exception as e:
                     traceback.print_exc()
         except Exception as e:
@@ -206,7 +218,7 @@ with open('client/src/data.json', 'w') as f:
         'subjects': subjects.reverseLookup(),
         'lectors': lectors.reverseLookup(),
         'auditories': auditories.reverseLookup(),
-        'days': { 0: 'Понедельник', 1: 'Вторник', 2: 'Среда', 3: 'Четверг', 4: 'Пятница' },
+        'days': { 0: 'Понедельник', 1: 'Вторник', 2: 'Среда', 3: 'Четверг', 4: 'Пятница', 5: 'Суббота' },
         'timestart': { 0: '9:30', 1: '11:20', 2: '13:10', 3: '15:25', 4: '17:15' },
         'timeend': { 0: '11:05', 1: '12:55', 2: '14:45', 3: '17:00', 4: '18:50' }
     }))
