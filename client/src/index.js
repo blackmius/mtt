@@ -198,11 +198,21 @@ const SearchResult = _ => {
     )
 };
 
-let input;
+let input, bt;
+function setBT() {
+    bt = !(localStorage.bt === 'true');
+    localStorage.bt = bt;
+    page.update();
+}
+setBT();
+setBT();
 
 const Search = z.g.jc(z.sz9(
     z.l4.b('Поиск'),
     z.sp1(),
+    z._svg.cp({viewBox:'0 0 1000 1000', style: 'position: fixed; top: 30px; left: 30px; width: 24px; height: 24px; fill: var(--c1)', onclick: setBT},
+        z._path({d:'M525.3,989.5C241.2,989.5,10,758.3,10,474.1c0-196.8,109.6-373.6,285.9-461.4c7.9-3.9,17.5-2.4,23.7,3.8c6.2,6.2,7.9,15.8,4,23.7c-32.2,65.4-48.5,135.7-48.5,208.9c0,261.4,212.7,474.1,474.1,474.1c74,0,145-16.7,211-49.5c7.9-3.9,17.5-2.4,23.7,3.8c6.3,6.3,7.9,15.8,3.9,23.7C900.5,879,723.3,989.5,525.3,989.5z'})
+    ),
     z.v({ onclick: e=>input.focus() },
         z.pr.ib(
             _ => z.h1.l2.text({ class: { c0: v.length === 0 }}, v || 'Группа, преподаватель или аудитория'),
@@ -230,6 +240,6 @@ const Main = z.main(
         : Search
 );
 
-const Body = z.ov.ys.bg1.c1(Main);
+const Body = z.ov.ys.bg1.c1({class: _=>({bt})}, Main);
 
 page.setBody(Body);

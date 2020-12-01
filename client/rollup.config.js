@@ -13,7 +13,7 @@ export default {
   plugins: [
     resolve(),
     commonjs({ include: 'node_modules/**' }),
-    postcss(),
+    postcss({ minimize: true }),
     json(),
     (process.env.NODE_ENV === 'production' && minify())
   ]

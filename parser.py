@@ -21,7 +21,7 @@ if len(os.listdir('sheets')) == 0:
 
     page = urllib.request.urlopen('http://www.mtuci.ru/time-table/')
     soup = BeautifulSoup(page, 'html.parser')
-    for link in soup.find_all('a', text=re.compile('^Факультет')):
+    for link in soup.find_all('a', text=re.compile('Направление')):
         try:
             url = 'http://www.mtuci.ru/time-table/' + urllib.parse.quote(link['href'])
             filename, headers = urllib.request.urlretrieve(url)
