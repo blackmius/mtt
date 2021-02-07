@@ -16,10 +16,12 @@ const ChangeWeek = week => z.l2.sp1('Cейчас ',
 
 const days = [0,1,2,3,4,5];
 
+const startMonth = 1; // Feb
+
 const Group = _=> {
     const id = Number(page.args.id);
     const start = moment().add(2, 'day').startOf('isoWeek').add((page.args.n === '' ? 7 : 0), 'day');
-    const week = Math.abs(start.week() - moment(new Date(start.year(), 8)).week());
+    const week = Math.abs(start.week() - moment(new Date(start.year(), startMonth)).week());
     const pairs = data.pairGroup.filter(
         ({pair, group}) => group === id && (data.weeks[data.pairs[pair].week] === 'Всегда' || data.weeks[data.pairs[pair].week] ===  ['Верхняя', 'Нижняя'][week % 2])
     ).map(({pair}) => pair);
@@ -78,7 +80,7 @@ const Pair = _ => {
 const Teacher = _ => {
     const id = Number(page.args.id);
     const start = moment().add(2, 'day').startOf('isoWeek').add((page.args.n === '' ? 7 : 0), 'day');
-    const week = Math.abs(start.week() - moment(new Date(start.year(), 8)).week());
+    const week = Math.abs(start.week() - moment(new Date(start.year(), startMonth)).week());
     const pairs = Object.entries(data.pairs).filter(
         ([pair, {lector}]) => lector === id && (data.weeks[data.pairs[Number(pair)].week] === 'Всегда' || data.weeks[data.pairs[Number(pair)].week] ===  ['Верхняя', 'Нижняя'][week % 2])
     ).map(([pair]) => Number(pair));
@@ -115,7 +117,7 @@ const Teacher = _ => {
 const Auditory = _ => {
     const id = Number(page.args.id);
     const start = moment().add(2, 'day').startOf('isoWeek').add((page.args.n === '' ? 7 : 0), 'day');
-    const week = Math.abs(start.week() - moment(new Date(start.year(), 8)).week());
+    const week = Math.abs(start.week() - moment(new Date(start.year(), startMonth)).week());
     const pairs = Object.entries(data.pairs).filter(
         ([pair, {auditory}]) => auditory === id && (data.weeks[data.pairs[Number(pair)].week] === 'Всегда' || data.weeks[data.pairs[Number(pair)].week] ===  ['Верхняя', 'Нижняя'][week % 2])
     ).map(([pair]) => Number(pair));

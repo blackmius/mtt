@@ -16,14 +16,14 @@ if not os.path.exists('sheets'):
 if len(os.listdir('sheets')) == 0:
     
     opener = urllib.request.build_opener()
-    opener.addheaders = [('User-agent', 'Mozilla/5.0'), ('Referer', 'http://mtuci.ru/time-table/')]
+    opener.addheaders = [('User-agent', 'Mozilla/5.0'), ('Referer', 'https://mtuci.ru/time-table/')]
     urllib.request.install_opener(opener)
 
-    page = urllib.request.urlopen('http://www.mtuci.ru/time-table/')
+    page = urllib.request.urlopen('https://mtuci.ru/time-table/')
     soup = BeautifulSoup(page, 'html.parser')
-    for link in soup.find_all('a', text=re.compile('Направление')):
+    for link in soup.find_all('a', text=re.compile('Расписание занятий')):
         try:
-            url = 'http://www.mtuci.ru/time-table/' + urllib.parse.quote(link['href'])
+            url = 'https://mtuci.ru/time-table/' + urllib.parse.quote(link['href'])
             filename, headers = urllib.request.urlretrieve(url)
             realname = os.path.basename(link['href'])
             os.rename(filename, f'sheets/{realname}')
